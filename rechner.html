@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SONIC AI – Kapitalrechner v2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #E4EBF8;
+  --card:      #FFFFFF;
+  --card-mint: #E8F0E9;
+  --blue:      #6B8ED8;
+  --cyan:      #00C4E8;
+  --green:     #3CB371;
+  --green-bg:  #D4EDDA;
+  --red:       #E07070;
+  --red-bg:    #FDECEA;
+  --gold:      #E8B84B;
+  --gold-dark: #B8860B;
+  --text:      #1A1A2E;
+  --text-2:    #6B7280;
+  --border:    #E4EBF8;
+  --radius:    20px;
+  --shadow:    0 2px 16px rgba(100,120,180,0.10);
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  font-size: 15px;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.wrapper {
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+/* ─── HEADER ─── */
+.header {
+  text-align: center;
+  padding: 24px 0 20px;
+}
+.logo-svg {
+  width: 160px;
+  height: auto;
+  margin-bottom: 6px;
+}
+.header-sub {
+  font-size: 13px;
+  color: var(--text-2);
+  font-weight: 500;
+  letter-spacing: 0.03em;
+}
+
+/* ─── CARD ─── */
+.card {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 24px;
+  margin-bottom: 16px;
+}
+.card-title {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-2);
+  margin-bottom: 20px;
+}
+
+/* ─── SLIDER GROUP ─── */
+.slider-group {
+  margin-bottom: 22px;
+}
+.slider-group:last-child { margin-bottom: 0; }
+.slider-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 8px;
+}
+.slider-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+.slider-value {
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--blue);
+}
+.slider-sub {
+  font-size: 12px;
+  color: var(--cyan);
+  font-weight: 600;
+  margin-top: 4px;
+  min-height: 18px;
+}
+
+input[type=range] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--bg);
+  outline: none;
+  cursor: pointer;
+  accent-color: var(--blue);
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--blue);
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(107,142,216,0.4);
+  border: 2px solid #fff;
+  transition: background 0.15s;
+}
+input[type=range]::-webkit-slider-thumb:hover {
+  background: #5a7dc6;
+}
+
+/* ─── TABS ─── */
+.tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.tab-btn {
+  padding: 12px 8px;
+  border-radius: 14px;
+  border: none;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: var(--bg);
+  color: var(--text-2);
+  line-height: 1.3;
+}
+.tab-btn.active {
+  background: var(--blue);
+  color: #fff;
+  box-shadow: 0 3px 12px rgba(107,142,216,0.35);
+}
+.tab-btn:not(.active):hover {
+  background: #d0daf0;
+  color: var(--text);
+}
+
+/* ─── KPI GRID ─── */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.kpi-card {
+  border-radius: 14px;
+  padding: 16px;
+  background: var(--bg);
+}
+.kpi-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-2);
+  margin-bottom: 6px;
+}
+.kpi-value {
+  font-size: 22px;
+  font-weight: 900;
+  line-height: 1.1;
+}
+.kpi-sub {
+  font-size: 11px;
+  color: var(--text-2);
+  margin-top: 4px;
+}
+.kpi-green .kpi-value { color: var(--green); }
+.kpi-gold  .kpi-value { color: var(--gold-dark); }
+.kpi-blue  .kpi-value { color: var(--blue); }
+.kpi-status-free {
+  background: var(--green-bg);
+  border: 1px solid #b3d9be;
+}
+.kpi-status-free .kpi-value { color: var(--green); font-size: 16px; }
+.kpi-status-locked {
+  background: var(--red-bg);
+  border: 1px solid #f2b8b8;
+}
+.kpi-status-locked .kpi-value { color: var(--red); font-size: 16px; }
+
+/* ─── ANIMATION CONTROLS ─── */
+.anim-bar {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.btn-anim {
+  padding: 9px 18px;
+  border-radius: 10px;
+  border: none;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.btn-play {
+  background: var(--blue);
+  color: #fff;
+}
+.btn-play:hover { background: #5a7dc6; }
+.btn-stop {
+  background: var(--red-bg);
+  color: var(--red);
+  border: 1px solid #f2b8b8;
+  display: none;
+}
+.btn-stop:hover { background: #f9d5d5; }
+
+/* ─── TABLE ─── */
+.table-wrap {
+  overflow-x: auto;
+  max-height: 380px;
+  overflow-y: auto;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  margin-bottom: 16px;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+thead {
+  position: sticky;
+  top: 0;
+  background: var(--blue);
+  color: #fff;
+  z-index: 1;
+}
+thead th {
+  padding: 10px 12px;
+  text-align: right;
+  font-weight: 700;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+thead th:first-child { text-align: center; }
+tbody tr {
+  border-bottom: 1px solid var(--border);
+  transition: background 0.15s;
+}
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: #f0f5ff; }
+tbody td {
+  padding: 9px 12px;
+  text-align: right;
+  color: var(--text);
+}
+tbody td:first-child {
+  text-align: center;
+  font-weight: 700;
+  color: var(--text-2);
+}
+tbody tr.row-breakeven {
+  background: var(--green-bg);
+}
+tbody tr.row-breakeven td { color: var(--green); font-weight: 700; }
+tbody tr.row-highlighted {
+  background: #dce8ff;
+}
+tbody tr.row-active-anim {
+  background: #fff3b0;
+}
+tbody tr.row-confetti {
+  background: var(--green-bg);
+  animation: pulse-green 0.6s ease;
+}
+@keyframes pulse-green {
+  0%   { background: #aeffae; }
+  100% { background: var(--green-bg); }
+}
+
+/* ─── INFO BOX ─── */
+.info-box {
+  border-radius: 14px;
+  padding: 14px 16px;
+  font-size: 13px;
+  line-height: 1.55;
+  font-weight: 500;
+}
+.info-gold {
+  background: #fff8e1;
+  border: 1px solid #f0d080;
+  color: var(--gold-dark);
+}
+.info-red {
+  background: var(--red-bg);
+  border: 1px solid #f2b8b8;
+  color: #a04040;
+}
+
+/* ─── CHART SECTION ─── */
+.chart-section {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 24px;
+  margin-bottom: 16px;
+}
+.chart-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-2);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  margin-bottom: 16px;
+}
+#comparison-chart {
+  width: 100%;
+  display: block;
+}
+.chart-legend {
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+  justify-content: center;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-2);
+}
+.legend-line {
+  width: 28px;
+  height: 3px;
+  border-radius: 2px;
+}
+.legend-dashed {
+  background: repeating-linear-gradient(
+    90deg, var(--blue) 0, var(--blue) 5px, transparent 5px, transparent 9px
+  );
+}
+.legend-solid {
+  background: var(--cyan);
+}
+.legend-dotted {
+  background: repeating-linear-gradient(
+    90deg, var(--gold) 0, var(--gold) 3px, transparent 3px, transparent 6px
+  );
+}
+
+/* ─── DISCLAIMER ─── */
+.disclaimer {
+  background: #fff;
+  border-radius: 14px;
+  padding: 16px;
+  font-size: 11px;
+  color: var(--text-2);
+  line-height: 1.6;
+  border: 1px solid var(--border);
+  margin-bottom: 20px;
+}
+.disclaimer strong { color: var(--red); }
+
+/* ─── HIDDEN ─── */
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 400px) {
+  body { padding: 12px; }
+  .kpi-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .kpi-value { font-size: 18px; }
+  .tabs { gap: 6px; }
+  .tab-btn { font-size: 12px; padding: 10px 6px; }
+}
+</style>
+</head>
+<body>
+<nav style="position:sticky;top:0;z-index:100;background:rgba(255,255,255,0.92);backdrop-filter:blur(12px);border-bottom:1px solid #E4EBF8;padding:12px 24px;display:flex;align-items:center;justify-content:space-between;max-width:640px;margin:0 auto;">
+  <a href="index.html" style="display:flex;align-items:center;gap:8px;text-decoration:none;font-size:14px;color:#6B7280;font-weight:500;">
+    ← Zurück zur Übersicht
+  </a>
+  <svg width="90" height="22" viewBox="0 0 90 22"><defs><linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#00E5FF"/><stop offset="100%" stop-color="#0094FF"/></linearGradient></defs><text x="0" y="18" font-family="Inter,system-ui,sans-serif" font-size="20" font-weight="800" fill="url(#g)">AI</text><text x="30" y="18" font-family="Inter,system-ui,sans-serif" font-size="20" font-weight="800" fill="#1A1A2E">TECH</text></svg>
+  <a href="index.html" style="background:#6B8ED8;color:white;padding:7px 16px;border-radius:8px;font-size:13px;font-weight:600;text-decoration:none;">Jetzt starten</a>
+</nav>
+<div class="wrapper">
+
+  <!-- HEADER -->
+  <div class="header">
+    <svg class="logo-svg" viewBox="0 0 200 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="cyanGrad" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#00E5FF"/>
+          <stop offset="100%" stop-color="#0094FF"/>
+        </linearGradient>
+      </defs>
+      <text x="0" y="37" font-family="Inter, Arial, sans-serif" font-weight="800" font-size="38" fill="url(#cyanGrad)">AI</text>
+      <text x="54" y="37" font-family="Inter, Arial, sans-serif" font-weight="800" font-size="38" fill="#1A1A2E">TECH</text>
+    </svg>
+    <div class="header-sub">SONIC AI Copy-Trading · Kapitalrechner</div>
+  </div>
+
+  <!-- INPUTS CARD -->
+  <div class="card">
+    <div class="card-title">Parameter</div>
+
+    <!-- Slider 1: Real-Einlage -->
+    <div class="slider-group">
+      <div class="slider-header">
+        <span class="slider-label">Real-Einlage</span>
+        <span class="slider-value" id="val-einlage">€ 10.000</span>
+      </div>
+      <input type="range" id="sl-einlage" min="500" max="100000" step="500" value="10000" oninput="onSliderChange()">
+      <div class="slider-sub" id="sub-einlage">MT5-Guthaben: € 240.000 (×24)</div>
+    </div>
+
+    <!-- Slider 2: Rendite -->
+    <div class="slider-group">
+      <div class="slider-header">
+        <span class="slider-label">MT5-Rendite / Monat</span>
+        <span class="slider-value" id="val-rendite">1,0 %</span>
+      </div>
+      <input type="range" id="sl-rendite" min="0.3" max="3" step="0.1" value="1.0" oninput="onSliderChange()">
+      <div class="slider-sub" id="sub-rendite">Entspricht ~16,8 % auf Real-Kapital (nach 30 % PF)</div>
+    </div>
+
+    <!-- Slider 3: Laufzeit -->
+    <div class="slider-group">
+      <div class="slider-header">
+        <span class="slider-label">Laufzeit</span>
+        <span class="slider-value" id="val-laufzeit">12 Monate</span>
+      </div>
+      <input type="range" id="sl-laufzeit" min="1" max="24" step="1" value="12" oninput="onSliderChange()">
+      <div class="slider-sub" id="sub-laufzeit"></div>
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab-btn active" id="tab-a-btn" onclick="switchTab('a')">📤 Ohne Reinvest</button>
+    <button class="tab-btn" id="tab-b-btn" onclick="switchTab('b')">🔄 Mit Reinvest (24×)</button>
+  </div>
+
+  <!-- TAB A: OHNE REINVEST -->
+  <div class="tab-panel active" id="tab-panel-a">
+    <div class="card">
+      <div class="card-title">Strategie A — Ohne Reinvest</div>
+
+      <!-- KPIs -->
+      <div class="kpi-grid">
+        <div class="kpi-card kpi-green">
+          <div class="kpi-label">Monatl. Netto-Profit</div>
+          <div class="kpi-value" id="a-monthly"></div>
+          <div class="kpi-sub">nach 30 % Performance Fee</div>
+        </div>
+        <div class="kpi-card kpi-gold">
+          <div class="kpi-label">Break-Even</div>
+          <div class="kpi-value" id="a-breakeven"></div>
+          <div class="kpi-sub">Einlage komplett zurück</div>
+        </div>
+        <div class="kpi-card kpi-blue">
+          <div class="kpi-label">Gesamtertrag</div>
+          <div class="kpi-value" id="a-total"></div>
+          <div class="kpi-sub" id="a-total-sub"></div>
+        </div>
+        <div class="kpi-card kpi-status-free">
+          <div class="kpi-label">Kapital-Status</div>
+          <div class="kpi-value">🟢 Frei</div>
+          <div class="kpi-sub">nach 30 Tagen</div>
+        </div>
+      </div>
+
+      <!-- Animation Controls -->
+      <div class="anim-bar">
+        <button class="btn-anim btn-play" id="btn-play-a" onclick="startAnim()">▶ Abspielen</button>
+        <button class="btn-anim btn-stop" id="btn-stop-a" onclick="stopAnim()">⏹ Stop</button>
+      </div>
+
+      <!-- Table -->
+      <div class="table-wrap">
+        <table id="table-a">
+          <thead>
+            <tr>
+              <th>Monat</th>
+              <th>Profit</th>
+              <th>Kumuliert</th>
+              <th>Noch offen</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-a"></tbody>
+        </table>
+      </div>
+
+      <div class="info-box info-gold">
+        💡 Bei dieser Strategie: Gewinne täglich entnehmbar · Kapital frei nach 30 Tagen · Kein 24× Zinseszins-Effekt
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB B: MIT REINVEST -->
+  <div class="tab-panel" id="tab-panel-b">
+    <div class="card">
+      <div class="card-title">Strategie B — Mit Reinvest (24×)</div>
+
+      <!-- KPIs -->
+      <div class="kpi-grid">
+        <div class="kpi-card kpi-green">
+          <div class="kpi-label">Profit Monat 1</div>
+          <div class="kpi-value" id="b-profit-m1"></div>
+          <div class="kpi-sub">Startpunkt</div>
+        </div>
+        <div class="kpi-card kpi-blue">
+          <div class="kpi-label" id="b-last-label">Profit Monat 12</div>
+          <div class="kpi-value" id="b-profit-last"></div>
+          <div class="kpi-sub">Endpunkt</div>
+        </div>
+        <div class="kpi-card kpi-gold">
+          <div class="kpi-label">Gesamtertrag</div>
+          <div class="kpi-value" id="b-total"></div>
+          <div class="kpi-sub" id="b-total-sub"></div>
+        </div>
+        <div class="kpi-card kpi-status-locked">
+          <div class="kpi-label">Kapital-Status</div>
+          <div class="kpi-value">🔒 Gesperrt</div>
+          <div class="kpi-sub">permanent (solange Reinvest)</div>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="table-wrap">
+        <table id="table-b">
+          <thead>
+            <tr>
+              <th>Monat</th>
+              <th>MT5-Stand</th>
+              <th>Monats-Profit</th>
+              <th>Kumuliert</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-b"></tbody>
+        </table>
+      </div>
+
+      <div class="info-box info-red">
+        ⚠️ Bei dieser Strategie: Jede Reinvestition setzt den 30-Tage-Lock zurück · Kapital PERMANENT gesperrt solange du reinvestierst · Höheres Wachstum durch 24× Zinseszins
+      </div>
+    </div>
+  </div>
+
+  <!-- COMPARISON CHART -->
+  <div class="chart-section">
+    <div class="chart-title">Vergleichs-Chart — Kumulierte Gewinne</div>
+    <svg id="comparison-chart" height="300" viewBox="0 0 600 300"></svg>
+    <div class="chart-legend">
+      <div class="legend-item">
+        <div class="legend-line legend-dashed"></div>
+        <span>Ohne Reinvest</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-line legend-solid"></div>
+        <span>Mit Reinvest</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-line legend-dotted"></div>
+        <span>Einlage (Break-Even)</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- DISCLAIMER -->
+  <div class="disclaimer">
+    <strong>⚠ Modellrechnung</strong> auf Basis historischer Durchschnittswerte · Tatsächliche Renditen schwanken und können erheblich abweichen oder negativ sein · Nur freies Kapital einsetzen · Keine Anlageberatung · SONIC AI © 2026 · <strong>Totalverlust möglich</strong>
+  </div>
+
+</div><!-- /wrapper -->
+
+<script>
+// ──────────────────────────────────────────────
+//  STATE
+// ──────────────────────────────────────────────
+let animTimer = null;
+let animRow   = 0;
+let animMax   = 0;
+let animBeRows = [];
+
+// ──────────────────────────────────────────────
+//  HELPERS
+// ──────────────────────────────────────────────
+function fmt(n) {
+  return '€ ' + Math.round(n).toLocaleString('de-DE');
+}
+function fmtNoSign(n) {
+  return Math.round(n).toLocaleString('de-DE');
+}
+function fmtPct(n) {
+  return n.toFixed(1).replace('.', ',') + ' %';
+}
+
+// ──────────────────────────────────────────────
+//  TAB SWITCH
+// ──────────────────────────────────────────────
+function switchTab(t) {
+  document.getElementById('tab-panel-a').classList.toggle('active', t === 'a');
+  document.getElementById('tab-panel-b').classList.toggle('active', t === 'b');
+  document.getElementById('tab-a-btn').classList.toggle('active', t === 'a');
+  document.getElementById('tab-b-btn').classList.toggle('active', t === 'b');
+}
+
+// ──────────────────────────────────────────────
+//  MAIN RECALCULATE
+// ──────────────────────────────────────────────
+function onSliderChange() {
+  stopAnim();
+
+  const einlage  = parseFloat(document.getElementById('sl-einlage').value);
+  const rendite  = parseFloat(document.getElementById('sl-rendite').value) / 100;
+  const laufzeit = parseInt(document.getElementById('sl-laufzeit').value);
+
+  const mt5 = einlage * 24;
+
+  // ── Slider display
+  document.getElementById('val-einlage').textContent  = fmt(einlage).replace('€ ', '€ ');
+  document.getElementById('val-rendite').textContent  = fmtPct(rendite * 100);
+  document.getElementById('val-laufzeit').textContent = laufzeit + ' Monat' + (laufzeit === 1 ? '' : 'e');
+
+  document.getElementById('sub-einlage').textContent =
+    'MT5-Guthaben: € ' + Math.round(mt5).toLocaleString('de-DE') + ' (×24)';
+
+  const realPct = rendite * 24 * 0.70 * 100;
+  document.getElementById('sub-rendite').textContent =
+    'Entspricht ~' + realPct.toFixed(1).replace('.', ',') + ' % auf Real-Kapital (nach 30 % PF)';
+
+  // ── STRATEGIE A
+  calcA(einlage, rendite, laufzeit, mt5);
+
+  // ── STRATEGIE B
+  calcB(einlage, rendite, laufzeit);
+
+  // ── CHART
+  drawChart(einlage, rendite, laufzeit);
+}
+
+// ──────────────────────────────────────────────
+//  STRATEGIE A
+// ──────────────────────────────────────────────
+function calcA(einlage, rendite, laufzeit, mt5) {
+  const monthlyBrutto = mt5 * rendite;
+  const monthlyNetto  = monthlyBrutto * 0.70;
+
+  let kumuliert = 0;
+  let beMonat   = null;
+  const rows    = [];
+
+  for (let m = 1; m <= laufzeit; m++) {
+    kumuliert += monthlyNetto;
+    const nochOffen = Math.max(0, einlage - kumuliert);
+    if (beMonat === null && kumuliert >= einlage) beMonat = m;
+    rows.push({ m, monthly: monthlyNetto, kumuliert, nochOffen });
+  }
+
+  // KPIs
+  document.getElementById('a-monthly').textContent   = fmt(monthlyNetto);
+  document.getElementById('a-breakeven').textContent = beMonat
+    ? 'Monat ' + beMonat
+    : '> ' + laufzeit + ' M';
+  document.getElementById('a-total').textContent     = fmt(kumuliert);
+  document.getElementById('a-total-sub').textContent =
+    'über ' + laufzeit + ' Monat' + (laufzeit === 1 ? '' : 'e');
+
+  // Table
+  const tbody = document.getElementById('tbody-a');
+  tbody.innerHTML = '';
+  rows.forEach(r => {
+    const tr = document.createElement('tr');
+    if (r.nochOffen === 0) tr.classList.add('row-breakeven');
+    const done  = r.nochOffen === 0;
+    const offen = done ? '✓ Einlage zurück' : fmt(r.nochOffen);
+    tr.innerHTML = `
+      <td>${r.m}</td>
+      <td>${fmt(r.monthly)}</td>
+      <td>${fmt(r.kumuliert)}</td>
+      <td>${offen}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  // Store for animation
+  animMax    = laufzeit;
+  animBeRows = rows.filter(r => r.nochOffen === 0).map(r => r.m);
+}
+
+// ──────────────────────────────────────────────
+//  STRATEGIE B
+// ──────────────────────────────────────────────
+function calcB(einlage, rendite, laufzeit) {
+  let mt5          = einlage * 24;
+  let realKapital  = einlage;
+  let kumuliert    = 0;
+  const rows       = [];
+  let profitM1     = null;
+  let doubleMonth  = null;
+
+  for (let m = 1; m <= laufzeit; m++) {
+    const brutto = mt5 * rendite;
+    const netto  = brutto * 0.70;
+    if (profitM1 === null) profitM1 = netto;
+    mt5         += netto * 24;
+    realKapital += netto;
+    kumuliert   += netto;
+    if (doubleMonth === null && netto >= profitM1 * 2) doubleMonth = m;
+    rows.push({ m, mt5, monthly: netto, kumuliert });
+  }
+
+  // KPIs
+  document.getElementById('b-profit-m1').textContent  = fmt(profitM1 || 0);
+  document.getElementById('b-profit-last').textContent = fmt(rows.length ? rows[rows.length - 1].monthly : 0);
+  document.getElementById('b-last-label').textContent  = 'Profit Monat ' + laufzeit;
+  document.getElementById('b-total').textContent       = fmt(kumuliert);
+  document.getElementById('b-total-sub').textContent   =
+    'über ' + laufzeit + ' Monat' + (laufzeit === 1 ? '' : 'e');
+
+  // Table
+  const tbody = document.getElementById('tbody-b');
+  tbody.innerHTML = '';
+  rows.forEach(r => {
+    const tr = document.createElement('tr');
+    if (r.m === doubleMonth) tr.classList.add('row-highlighted');
+    tr.innerHTML = `
+      <td>${r.m}</td>
+      <td>${fmt(r.mt5)}</td>
+      <td>${fmt(r.monthly)}</td>
+      <td>${fmt(r.kumuliert)}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+// ──────────────────────────────────────────────
+//  SVG CHART
+// ──────────────────────────────────────────────
+function drawChart(einlage, rendite, laufzeit) {
+  const svg    = document.getElementById('comparison-chart');
+  const W      = 600;
+  const H      = 300;
+  const PAD    = { top: 20, right: 20, bottom: 40, left: 70 };
+  const cW     = W - PAD.left - PAD.right;
+  const cH     = H - PAD.top  - PAD.bottom;
+
+  // Compute data: Strategie A
+  const mt5A  = einlage * 24;
+  const mNetA = mt5A * rendite * 0.70;
+  const dataA = [];
+  for (let m = 0; m <= laufzeit; m++) {
+    dataA.push({ m, y: m * mNetA });
+  }
+
+  // Compute data: Strategie B
+  let mt5B = einlage * 24;
+  let cumB = 0;
+  const dataB = [{ m: 0, y: 0 }];
+  for (let m = 1; m <= laufzeit; m++) {
+    const b = mt5B * rendite;
+    const n = b * 0.70;
+    mt5B   += n * 24;
+    cumB   += n;
+    dataB.push({ m, y: cumB });
+  }
+
+  const allY = [...dataA.map(d => d.y), ...dataB.map(d => d.y), einlage];
+  const maxY = Math.max(...allY);
+
+  const scaleX = m  => PAD.left + (m / laufzeit) * cW;
+  const scaleY = y  => PAD.top + cH - (y / maxY) * cH;
+
+  // Y axis ticks
+  const nTicks = 5;
+  const tickStep = maxY / nTicks;
+  const ticks = [];
+  for (let i = 0; i <= nTicks; i++) ticks.push(i * tickStep);
+
+  // Build SVG string
+  let html = '';
+
+  // Grid lines
+  html += `<g stroke="#e0e8f4" stroke-width="1">`;
+  ticks.forEach(t => {
+    const y = scaleY(t);
+    html += `<line x1="${PAD.left}" y1="${y.toFixed(1)}" x2="${PAD.left + cW}" y2="${y.toFixed(1)}"/>`;
+  });
+  html += `</g>`;
+
+  // Y axis labels
+  html += `<g font-family="Inter,sans-serif" font-size="11" fill="#6B7280" text-anchor="end">`;
+  ticks.forEach(t => {
+    const y = scaleY(t);
+    const label = t >= 1000 ? (t/1000).toFixed(0) + 'k' : t.toFixed(0);
+    html += `<text x="${PAD.left - 6}" y="${(y + 4).toFixed(1)}">€${label}</text>`;
+  });
+  html += `</g>`;
+
+  // X axis labels
+  html += `<g font-family="Inter,sans-serif" font-size="11" fill="#6B7280" text-anchor="middle">`;
+  const xStep = laufzeit <= 12 ? 1 : laufzeit <= 18 ? 2 : 3;
+  for (let m = 0; m <= laufzeit; m += xStep) {
+    const x = scaleX(m);
+    html += `<text x="${x.toFixed(1)}" y="${(PAD.top + cH + 18).toFixed(1)}">${m}</text>`;
+  }
+  html += `<text x="${(PAD.left + cW/2).toFixed(1)}" y="${H - 2}" font-weight="600" fill="#9ca3af">Monat</text>`;
+  html += `</g>`;
+
+  // Break-Even line (gold dotted)
+  const beY = scaleY(einlage);
+  if (einlage <= maxY) {
+    html += `<line x1="${PAD.left}" y1="${beY.toFixed(1)}" x2="${PAD.left + cW}" y2="${beY.toFixed(1)}"
+      stroke="#E8B84B" stroke-width="1.5" stroke-dasharray="4,4" opacity="0.85"/>`;
+    // Find BE month for Strategie A
+    let beM = dataA.find(d => d.y >= einlage);
+    if (beM) {
+      const bx = scaleX(beM.m);
+      const by = scaleY(beM.y);
+      html += `<circle cx="${bx.toFixed(1)}" cy="${by.toFixed(1)}" r="5" fill="#E8B84B" stroke="#fff" stroke-width="2"/>`;
+      const labelX = Math.min(bx + 8, PAD.left + cW - 80);
+      html += `<text x="${(labelX).toFixed(1)}" y="${(by - 8).toFixed(1)}"
+        font-family="Inter,sans-serif" font-size="10" font-weight="700" fill="#B8860B">Break-Even M${beM.m}</text>`;
+    }
+  }
+
+  // Line A: Ohne Reinvest (blue, dashed)
+  let pathA = '';
+  dataA.forEach((d, i) => {
+    const x = scaleX(d.m);
+    const y = scaleY(d.y);
+    pathA += (i === 0 ? `M${x.toFixed(1)},${y.toFixed(1)}` : ` L${x.toFixed(1)},${y.toFixed(1)}`);
+  });
+  html += `<path d="${pathA}" fill="none" stroke="#6B8ED8" stroke-width="2.5"
+    stroke-dasharray="7,4" stroke-linecap="round"/>`;
+
+  // Line B: Mit Reinvest (cyan, solid)
+  let pathB = '';
+  dataB.forEach((d, i) => {
+    const x = scaleX(d.m);
+    const y = scaleY(d.y);
+    pathB += (i === 0 ? `M${x.toFixed(1)},${y.toFixed(1)}` : ` L${x.toFixed(1)},${y.toFixed(1)}`);
+  });
+  html += `<path d="${pathB}" fill="none" stroke="#00C4E8" stroke-width="2.5" stroke-linecap="round"/>`;
+
+  svg.innerHTML = html;
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+}
+
+// ──────────────────────────────────────────────
+//  ANIMATION
+// ──────────────────────────────────────────────
+function startAnim() {
+  if (animTimer) return;
+  animRow = 0;
+  document.getElementById('btn-play-a').style.display = 'none';
+  document.getElementById('btn-stop-a').style.display = 'inline-flex';
+
+  const tbody = document.getElementById('tbody-a');
+
+  function step() {
+    // Remove previous highlight
+    const prev = tbody.querySelectorAll('tr.row-active-anim');
+    prev.forEach(r => r.classList.remove('row-active-anim'));
+
+    if (animRow >= tbody.rows.length) {
+      stopAnim();
+      return;
+    }
+
+    const row = tbody.rows[animRow];
+    row.classList.add('row-active-anim');
+    row.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+    // Check if this is the Break-Even row
+    const isBreakEven = animBeRows.includes(animRow + 1);
+    if (isBreakEven) {
+      row.classList.add('row-confetti');
+      setTimeout(() => {
+        const confetti = document.createElement('span');
+        confetti.textContent = ' 🎉';
+        row.lastElementChild.appendChild(confetti);
+      }, 100);
+      stopAnim();
+      document.getElementById('btn-play-a').style.display = 'inline-flex';
+      return;
+    }
+
+    animRow++;
+    animTimer = setTimeout(step, 500);
+  }
+
+  animTimer = setTimeout(step, 100);
+}
+
+function stopAnim() {
+  if (animTimer) {
+    clearTimeout(animTimer);
+    animTimer = null;
+  }
+  document.getElementById('btn-play-a').style.display = 'inline-flex';
+  document.getElementById('btn-stop-a').style.display = 'none';
+
+  const tbody = document.getElementById('tbody-a');
+  const rows  = tbody.querySelectorAll('tr.row-active-anim');
+  rows.forEach(r => r.classList.remove('row-active-anim'));
+}
+
+// ──────────────────────────────────────────────
+//  INIT
+// ──────────────────────────────────────────────
+onSliderChange();
+</script>
+</body>
+</html>
