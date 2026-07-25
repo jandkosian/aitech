@@ -723,54 +723,269 @@
       <strong>Wichtiger Hinweis:</strong> ~20% Monatsrendite sind Durchschnittswerte aus der bisherigen Performance-Historie — sie sind ausdrücklich NICHT garantiert und können in zukünftigen Monaten abweichen.
     </div>
 
-    <!-- Letzte 5 Trades -->
+    <!-- 4-Wochen Rückblick -->
     <div class="card" style="padding:0;overflow:hidden;">
-      <div style="padding:24px 28px 16px;border-bottom:1px solid var(--bg);">
-        <h3 style="font-size:16px;">Letzte Trades</h3>
+      <div style="padding:20px 24px 14px;border-bottom:1px solid var(--bg);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+        <h3 style="font-size:16px;margin:0;">4-Wochen Rückblick · XAU/USD</h3>
+        <span style="font-size:12px;color:var(--text-2);">Netto = nach 30% Performance Fee</span>
       </div>
-      <table class="trade-table">
-        <thead>
-          <tr>
-            <th>Datum</th>
-            <th>Instrument</th>
-            <th>Richtung</th>
-            <th>Ergebnis</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td style="color:var(--text-2);font-size:13px;">25. Jul 2026</td>
-            <td><strong>XAU/USD</strong></td>
-            <td><span class="badge badge-blue">LONG</span></td>
-            <td><span class="badge badge-green">+0,48%</span></td>
-          </tr>
-          <tr>
-            <td style="color:var(--text-2);font-size:13px;">25. Jul 2026</td>
-            <td><strong>XAU/USD</strong></td>
-            <td><span class="badge badge-blue">LONG</span></td>
-            <td><span class="badge badge-green">+0,62%</span></td>
-          </tr>
-          <tr>
-            <td style="color:var(--text-2);font-size:13px;">24. Jul 2026</td>
-            <td><strong>XAU/USD</strong></td>
-            <td><span class="badge badge-red" style="background:#fde8e8;color:#b94040;">SHORT</span></td>
-            <td><span class="badge badge-green">+0,31%</span></td>
-          </tr>
-          <tr>
-            <td style="color:var(--text-2);font-size:13px;">24. Jul 2026</td>
-            <td><strong>XAU/USD</strong></td>
-            <td><span class="badge badge-blue">LONG</span></td>
-            <td><span class="badge badge-red">−0,18%</span></td>
-          </tr>
-          <tr>
-            <td style="color:var(--text-2);font-size:13px;">23. Jul 2026</td>
-            <td><strong>XAU/USD</strong></td>
-            <td><span class="badge badge-blue">LONG</span></td>
-            <td><span class="badge badge-green">+0,77%</span></td>
-          </tr>
-        </tbody>
-      </table>
+
+      <style>
+        .week-acc { border-bottom: 1px solid var(--bg); }
+        .week-acc:last-child { border-bottom: none; }
+        .week-toggle {
+          width:100%; background:none; border:none; cursor:pointer;
+          padding:14px 24px; display:flex; align-items:center;
+          justify-content:space-between; gap:12px; font-family:inherit;
+          transition: background 0.15s;
+        }
+        .week-toggle:hover { background: #f5f7fc; }
+        .week-toggle-left { display:flex; align-items:center; gap:12px; }
+        .week-toggle-label { font-size:14px; font-weight:700; color:var(--text); }
+        .week-toggle-sub { font-size:12px; color:var(--text-2); }
+        .week-toggle-right { display:flex; align-items:center; gap:10px; }
+        .week-sum-g { font-size:13px; font-weight:700; color:var(--green); }
+        .week-sum-r { font-size:13px; font-weight:700; color:var(--red); }
+        .week-chevron { color:var(--text-2); font-size:14px; transition:transform 0.2s; }
+        .week-body { display:none; }
+        .week-body.open { display:block; }
+        .week-toggle.open .week-chevron { transform:rotate(180deg); }
+
+        .day-row {
+          display:grid;
+          grid-template-columns: 80px 1fr 90px 90px;
+          align-items:center; gap:8px;
+          padding:10px 24px;
+          border-top:1px solid var(--bg);
+          font-size:13px;
+        }
+        .day-row:hover { background:#f9fafb; }
+        .day-date-col { color:var(--text-2); font-size:12px; }
+        .day-badge-col { display:flex; gap:6px; flex-wrap:wrap; }
+        .day-brutto { text-align:right; font-weight:600; }
+        .day-netto  { text-align:right; font-weight:600; color:var(--text-2); font-size:12px; }
+        .val-g { color:var(--green); }
+        .val-r { color:var(--red); }
+        .day-hdr {
+          display:grid;
+          grid-template-columns: 80px 1fr 90px 90px;
+          gap:8px; padding:8px 24px 6px;
+          font-size:11px; font-weight:600;
+          letter-spacing:0.06em; text-transform:uppercase;
+          color:var(--text-2); background:#f5f7fc;
+          border-top:1px solid var(--bg);
+        }
+        .pf-row {
+          padding:10px 24px; font-size:12px;
+          color:#9a7020; background:#fdf8ec;
+          border-top:1px solid #f0e8cc;
+          display:flex; align-items:center; gap:8px;
+        }
+        @media(max-width:520px){
+          .day-row,.day-hdr { grid-template-columns: 68px 1fr 72px 72px; padding:10px 16px; }
+          .week-toggle { padding:14px 16px; }
+          .pf-row { padding:10px 16px; }
+        }
+      </style>
+
+      <!-- ── KW 1 ── -->
+      <div class="week-acc">
+        <button class="week-toggle" onclick="toggleWeek(this)">
+          <div class="week-toggle-left">
+            <div>
+              <div class="week-toggle-label">KW 1 · 01.–03. Juli</div>
+              <div class="week-toggle-sub">3 Handelstage · K1</div>
+            </div>
+          </div>
+          <div class="week-toggle-right">
+            <span class="week-sum-g">∑ +1,43%</span>
+            <span class="week-chevron">▾</span>
+          </div>
+        </button>
+        <div class="week-body">
+          <div class="day-hdr"><span>Datum</span><span>Info</span><span style="text-align:right">Brutto</span><span style="text-align:right">Netto</span></div>
+          <div class="day-row">
+            <span class="day-date-col">01.07 Di</span>
+            <div class="day-badge-col"><span class="badge badge-green">1W</span></div>
+            <span class="day-brutto val-g">+1,13%</span>
+            <span class="day-netto val-g">+0,79%</span>
+          </div>
+          <div class="day-row">
+            <span class="day-date-col">02.07 Mi</span>
+            <div class="day-badge-col"><span class="badge badge-red">1L</span></div>
+            <span class="day-brutto val-r">−0,61%</span>
+            <span class="day-netto val-r">−0,61%</span>
+          </div>
+          <div class="day-row">
+            <span class="day-date-col">03.07 Do</span>
+            <div class="day-badge-col"><span class="badge badge-green">2W</span></div>
+            <span class="day-brutto val-g">+0,91%</span>
+            <span class="day-netto val-g">+0,64%</span>
+          </div>
+          <div class="pf-row">⚡ Performance Fee 04.07 abgezogen</div>
+        </div>
+      </div>
+
+      <!-- ── KW 2 ── -->
+      <div class="week-acc">
+        <button class="week-toggle" onclick="toggleWeek(this)">
+          <div class="week-toggle-left">
+            <div>
+              <div class="week-toggle-label">KW 2 · 06.–10. Juli</div>
+              <div class="week-toggle-sub">5 Handelstage · K1</div>
+            </div>
+          </div>
+          <div class="week-toggle-right">
+            <span class="week-sum-g">∑ +4,63%</span>
+            <span class="week-chevron">▾</span>
+          </div>
+        </button>
+        <div class="week-body">
+          <div class="day-hdr"><span>Datum</span><span>Info</span><span style="text-align:right">Brutto</span><span style="text-align:right">Netto</span></div>
+          <div class="day-row">
+            <span class="day-date-col">06.07 Mo</span>
+            <div class="day-badge-col"><span class="badge badge-green">1W</span></div>
+            <span class="day-brutto val-g">+0,68%</span>
+            <span class="day-netto val-g">+0,48%</span>
+          </div>
+          <div class="day-row">
+            <span class="day-date-col">07.07 Di</span>
+            <div class="day-badge-col"><span class="badge badge-green">2W</span><span class="badge badge-red">1L</span></div>
+            <span class="day-brutto val-g">+0,79%</span>
+            <span class="day-netto val-g">+0,55%</span>
+          </div>
+          <div class="day-row">
+            <span class="day-date-col">08.07 Mi</span>
+            <div class="day-badge-col"><span class="badge badge-green">2W</span></div>
+            <span class="day-brutto val-g">+1,17%</span>
+            <span class="day-netto val-g">+0,82%</span>
+          </div>
+          <div class="day-row">
+            <span class="day-date-col">09.07 Do</span>
+            <div class="day-badge-col"><span class="badge badge-green">2W</span></div>
+            <span class="day-brutto val-g">+1,29%</span>
+            <span class="day-netto val-g">+0,90%</span>
+          </div>
+          <div class="day-row">
+            <span class="day-date-col">10.07 Fr</span>
+            <div class="day-badge-col"><span class="badge badge-green">1W</span></div>
+            <span class="day-brutto val-g">+0,70%</span>
+            <span class="day-netto val-g">+0,49%</span>
+          </div>
+          <div class="pf-row">⚡ Performance Fee 11.07 abgezogen</div>
+        </div>
+      </div>
+
+      <!-- ── KW 3 ── -->
+      <div class="week-acc">
+        <button class="week-toggle" onclick="toggleWeek(this)">
+          <div class="week-toggle-left">
+            <div>
+              <div class="week-toggle-label">KW 3 · 13.–17. Juli</div>
+              <div class="week-toggle-sub">5 Handelstage · K1 + K4</div>
+            </div>
+          </div>
+          <div class="week-toggle-right">
+            <span class="week-sum-g">∑ +3,56%</span>
+            <span class="week-chevron">▾</span>
+          </div>
+        </button>
+        <div class="week-body">
+          <div class="day-hdr"><span>Datum</span><span>Info</span><span style="text-align:right">Brutto</span><span style="text-align:right">Netto</span></div>
+          <div class="day-row">
+            <span class="day-date-col">13.07 So</span>
+            <div class="day-badge-col"><span class="badge badge-green">1W</span><span class="badge badge-red">1L</span></div>
+            <span class="day-brutto val-g">+0,62%</span>
+            <span class="day-netto val-g">+0,43%</span>
+          </div>
+          <div class="day-row">
+            <span class="day-date-col">14.07 Mo</span>
+            <div class="day-badge-col"><span class="badge badge-green">1W</span><span class="badge badge-red">1L</span></div>
+            <span class="day-brutto val-g">+0,72%</span>
+            <span class="day-netto val-g">+0,50%</span>
+          </div>
+          <div class="day-row">
+            <span class="day-date-col">15.07 Di</span>
+            <div class="day-badge-col"><span class="badge badge-green">4W</span></div>
+            <span class="day-brutto val-g">+1,14%</span>
+            <span class="day-netto val-g">+0,80%</span>
+          </div>
+          <div class="day-row">
+            <span class="day-date-col">16.07 Mi</span>
+            <div class="day-badge-col"><span class="badge badge-green">2W</span></div>
+            <span class="day-brutto val-g">+0,36%</span>
+            <span class="day-netto val-g">+0,25%</span>
+          </div>
+          <div class="day-row">
+            <span class="day-date-col">17.07 Do</span>
+            <div class="day-badge-col"><span class="badge badge-green">2W</span></div>
+            <span class="day-brutto val-g">+0,72%</span>
+            <span class="day-netto val-g">+0,50%</span>
+          </div>
+          <div class="pf-row">⚡ Performance Fee 18.07 abgezogen · K1 −$26,40 · K4 −$51,19</div>
+        </div>
+      </div>
+
+      <!-- ── KW 4 ── -->
+      <div class="week-acc">
+        <button class="week-toggle open" onclick="toggleWeek(this)">
+          <div class="week-toggle-left">
+            <div>
+              <div class="week-toggle-label">KW 4 · 20.–24. Juli</div>
+              <div class="week-toggle-sub">5 Handelstage · K1 + K4</div>
+            </div>
+          </div>
+          <div class="week-toggle-right">
+            <span class="week-sum-g">∑ +4,37%</span>
+            <span class="week-chevron">▾</span>
+          </div>
+        </button>
+        <div class="week-body open">
+          <div class="day-hdr"><span>Datum</span><span>Info</span><span style="text-align:right">Brutto</span><span style="text-align:right">Netto</span></div>
+          <div class="day-row">
+            <span class="day-date-col">20.07 So</span>
+            <div class="day-badge-col"><span class="badge badge-green">4W</span></div>
+            <span class="day-brutto val-g">+1,22%</span>
+            <span class="day-netto val-g">+0,85%</span>
+          </div>
+          <div class="day-row">
+            <span class="day-date-col">21.07 Mo</span>
+            <div class="day-badge-col"><span class="badge badge-green">4W</span></div>
+            <span class="day-brutto val-g">+0,96%</span>
+            <span class="day-netto val-g">+0,67%</span>
+          </div>
+          <div class="day-row">
+            <span class="day-date-col">22.07 Di</span>
+            <div class="day-badge-col"><span class="badge badge-green">4W</span></div>
+            <span class="day-brutto val-g">+0,46%</span>
+            <span class="day-netto val-g">+0,32%</span>
+          </div>
+          <div class="day-row">
+            <span class="day-date-col">23.07 Mi</span>
+            <div class="day-badge-col"><span class="badge badge-green">2W</span><span class="badge badge-red">2L</span></div>
+            <span class="day-brutto val-g">+0,14%</span>
+            <span class="day-netto val-g">+0,10%</span>
+          </div>
+          <div class="day-row">
+            <span class="day-date-col">24.07 Do</span>
+            <div class="day-badge-col"><span class="badge badge-green">4W</span></div>
+            <span class="day-brutto val-g">+1,59%</span>
+            <span class="day-netto val-g">+1,11%</span>
+          </div>
+          <div class="pf-row">⚡ Performance Fee 25.07 abgezogen · K1 −$31,82 · K4 −$87,48</div>
+        </div>
+      </div>
+
     </div>
+
+    <script>
+      function toggleWeek(btn) {
+        const body = btn.nextElementSibling;
+        const isOpen = body.classList.contains('open');
+        body.classList.toggle('open', !isOpen);
+        btn.classList.toggle('open', !isOpen);
+      }
+    </script>
   </div>
 </section>
 
