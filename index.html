@@ -589,11 +589,24 @@
 
         <div style="margin-top:16px;padding:14px 16px;background:rgba(122,184,154,0.1);border-left:3px solid var(--green);border-radius:0 10px 10px 0;">
           <div style="font-size:12px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--green);margin-bottom:8px;">Statistische Risikobewertung</div>
-          <p style="font-size:13px;margin-bottom:8px;">Bei einer verifizierten Win-Rate von <strong>86,84%</strong> beträgt die Wahrscheinlichkeit eines einzelnen Verlusttrades ~13,2%. Die Wahrscheinlichkeit von 34 aufeinanderfolgenden Verlusten — was ein Konto schließen würde — ergibt sich aus:</p>
-          <div style="font-size:13px;text-align:center;padding:10px;background:rgba(255,255,255,0.6);border-radius:8px;margin-bottom:8px;">
-            <strong>P = 0,1316<sup>34</sup> ≈ 1,13 × 10<sup>−30</sup> ≈ 1 zu 880.000.000.000.000.000.000.000.000.000</strong>
+          <p style="font-size:13px;margin-bottom:10px;">Bei einer verifizierten Win-Rate von <strong>86,84%</strong> beträgt die Verlustwahrscheinlichkeit pro Trade <strong>13,16%</strong>. Ein Konto schließt erst bei 34 aufeinanderfolgenden Verlusten. Berechnung:</p>
+
+          <div style="background:rgba(255,255,255,0.65);border-radius:8px;padding:12px 14px;margin-bottom:10px;font-size:12px;font-family:ui-monospace,monospace;line-height:1.9;">
+            <div>Verlustrate      = 1 − 0,8684 = <strong>0,1316</strong></div>
+            <div>0,1316²  = 0,01732</div>
+            <div>0,1316⁴  = 3,00 × 10⁻⁴</div>
+            <div>0,1316⁸  = 9,00 × 10⁻⁸</div>
+            <div>0,1316¹⁶ = 8,09 × 10⁻¹⁵</div>
+            <div>0,1316³² = 6,54 × 10⁻²⁹</div>
+            <div style="border-top:1px solid rgba(107,142,216,0.2);margin-top:6px;padding-top:6px;">
+              <strong>0,1316³⁴ = 6,54 × 10⁻²⁹ × 0,01732 ≈ 1,13 × 10⁻³⁰</strong>
+            </div>
           </div>
-          <p style="font-size:12px;color:var(--text-2);">Zum Vergleich: Das Universum enthält schätzungsweise 10<sup>82</sup> Atome. Diese Wahrscheinlichkeit liegt 10<sup>52</sup>-mal darunter — auf Basis der bisherigen historischen Daten. Vergangene Performance garantiert keine zukünftigen Ergebnisse.</p>
+
+          <div style="font-size:13px;text-align:center;padding:10px;background:rgba(255,255,255,0.6);border-radius:8px;margin-bottom:8px;">
+            <strong>P ≈ 1 zu 880.000.000.000.000.000.000.000.000.000</strong>
+          </div>
+          <p style="font-size:12px;color:var(--text-2);">Zum Vergleich: Das Universum enthält ~10<sup>82</sup> Atome — diese Wahrscheinlichkeit ist 10<sup>52</sup>-mal kleiner. Auf Basis historischer Daten. Vergangene Performance garantiert keine zukünftigen Ergebnisse.</p>
         </div>
       </div>
       <div class="eco-card">
