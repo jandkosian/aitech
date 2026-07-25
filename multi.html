@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AITECH – Multi-Konto-Rechner</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+:root {
+  --bg:#0d0f14; --s1:#13161f; --s2:#0f1118;
+  --bd:#1e2230; --bd2:#2a2d3a;
+  --text:#e8e6e0; --muted:#8892a4; --dim:#555e78;
+  --gold:#d4a843; --gold-d:#b8902e;
+  --green:#22c55e; --blue:#60a5fa; --orange:#f59e0b; --red:#ef4444;
+}
+body { background:var(--bg); color:var(--text); font-family:system-ui,-apple-system,'Segoe UI',sans-serif; font-size:14px; max-width:720px; margin:0 auto; padding-bottom:50px; line-height:1.5; }
+
+.hdr { padding:16px 14px 0; text-align:center; }
+.eyebrow { font-size:9px; letter-spacing:.18em; text-transform:uppercase; color:var(--gold); margin-bottom:5px; }
+h1 { font-size:21px; font-weight:800; color:#fff; letter-spacing:-.3px; }
+.sub { font-size:11px; color:var(--dim); margin-top:3px; }
+
+.card { background:var(--s1); border-radius:12px; border:1px solid var(--bd); margin:14px 14px 12px; overflow:hidden; }
+.ch { display:flex; align-items:center; gap:8px; padding:10px 14px; background:var(--s2); border-bottom:1px solid var(--bd); }
+.ci { font-size:15px; }
+.ct { font-size:13px; font-weight:700; color:#fff; flex:1; }
+.cb { padding:12px 14px; }
+
+.bdg { font-size:9px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; padding:2px 7px; border-radius:4px; white-space:nowrap; }
+.bg { background:#0d2b0d; color:var(--green); }
+.bo { background:#2a1d00; color:var(--gold); }
+.bb { background:#0a1520; color:var(--blue); }
+.ba { background:#1a1300; color:var(--orange); }
+
+.ir { display:flex; align-items:center; gap:8px; margin-bottom:10px; }
+.ir:last-child { margin-bottom:0; }
+.il { flex:1; font-size:12px; color:var(--muted); }
+.il small { display:block; font-size:10px; color:var(--dim); margin-top:1px; }
+input[type=number] { width:108px; background:var(--s2); border:1px solid var(--bd2); border-radius:8px; color:#fff; padding:7px 10px; font-size:13px; font-weight:700; text-align:right; outline:none; -moz-appearance:textfield; transition:border-color .15s; }
+input[type=number]:focus { border-color:var(--gold); }
+input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button { -webkit-appearance:none; }
+.iu { font-size:12px; color:var(--dim); width:26px; flex-shrink:0; }
+
+.rr { display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid var(--bd); }
+.rr:last-child { border-bottom:none; }
+.rl { font-size:12px; color:var(--muted); }
+.rv { font-size:14px; font-weight:700; text-align:right; }
+.rw { color:#fff; } .rg { color:var(--green); } .rb { color:var(--blue); }
+.ro { color:var(--gold); } .rn { color:var(--orange); } .rred { color:var(--red); } .rd { color:var(--dim); }
+
+.hb { border-radius:9px; padding:10px 13px; margin:10px 0; display:flex; justify-content:space-between; align-items:center; }
+.hl { font-size:12px; color:var(--muted); }
+.hs { font-size:10px; color:var(--dim); margin-top:2px; }
+.hv { font-size:22px; font-weight:800; text-align:right; }
+.hb.grn { background:#0d2b0d; border:1px solid #166534; } .hb.grn .hv { color:var(--green); }
+.hb.gld { background:#1a1200; border:1px solid #4a3800; } .hb.gld .hv { color:var(--gold); }
+
+/* Multi-Konto-Tabelle */
+.multi-table { width:100%; border-collapse:collapse; font-size:12px; }
+.multi-table th { font-size:9px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--dim); padding:8px 10px; border-bottom:1px solid var(--bd); text-align:right; white-space:nowrap; }
+.multi-table th:first-child { text-align:left; }
+.multi-table td { padding:9px 10px; border-bottom:1px solid #1a1d28; text-align:right; vertical-align:middle; }
+.multi-table td:first-child { text-align:left; }
+.multi-table tr:last-child td { border-bottom:none; background:var(--s2); font-weight:700; }
+.multi-table tr.account-row:hover td { background:#1a1d28; }
+
+/* Account-Name Input in Tabelle */
+.acc-name { background:transparent; border:none; color:#fff; font-size:12px; font-weight:600; width:100px; outline:none; font-family:inherit; cursor:pointer; }
+.acc-name:focus { border-bottom:1px solid var(--gold); color:var(--gold); }
+
+/* Inline number in table */
+.td-input { background:var(--s2); border:1px solid var(--bd2); border-radius:6px; color:#fff; padding:5px 8px; font-size:12px; font-weight:700; text-align:right; outline:none; width:80px; -moz-appearance:textfield; }
+.td-input:focus { border-color:var(--gold); }
+.td-input::-webkit-inner-spin-button,.td-input::-webkit-outer-spin-button { -webkit-appearance:none; }
+
+/* Konto hinzufügen / entfernen */
+.row-actions { display:flex; gap:6px; justify-content:flex-end; padding:10px 14px 4px; }
+.btn-add { background:var(--gold); color:#0d0f14; border:none; border-radius:8px; padding:7px 14px; font-size:12px; font-weight:700; cursor:pointer; transition:background .15s; }
+.btn-add:hover { background:var(--gold-d); }
+.btn-rm { background:var(--s2); border:1px solid var(--bd2); color:var(--red); border-radius:6px; padding:4px 8px; font-size:11px; font-weight:700; cursor:pointer; transition:all .15s; flex-shrink:0; }
+.btn-rm:hover { background:#2a1010; border-color:var(--red); }
+
+.note { background:#13110a; border:1px solid #2a1d00; border-radius:8px; padding:8px 12px; margin:8px 0; font-size:11px; color:var(--dim); line-height:1.6; }
+.note b { color:var(--gold); }
+
+.gtotal { background:#0d2b0d; border:1px solid #166534; border-radius:12px; padding:14px; display:flex; justify-content:space-between; align-items:center; margin:12px 14px 8px; }
+.gtl { font-size:12px; color:var(--muted); }
+.gts { font-size:10px; color:var(--dim); margin-top:3px; }
+.gtv { font-size:28px; font-weight:800; color:var(--green); }
+
+.fnote { font-size:10px; color:var(--dim); text-align:center; padding:10px 14px 4px; line-height:1.7; }
+
+/* Zusammenfassung-Balken */
+.sum-bar { display:flex; gap:12px; padding:0 14px; margin:0 0 4px; flex-wrap:wrap; }
+.sum-pill { background:var(--s2); border:1px solid var(--bd); border-radius:8px; padding:8px 12px; flex:1; min-width:120px; text-align:center; }
+.sum-pill .sp-val { font-size:18px; font-weight:800; }
+.sum-pill .sp-lbl { font-size:10px; color:var(--dim); margin-top:2px; }
+</style>
+</head>
+<body>
+
+<!-- NAVIGATION -->
+<nav style="position:sticky;top:0;z-index:100;background:rgba(255,255,255,0.92);backdrop-filter:blur(12px);border-bottom:1px solid #E4EBF8;padding:12px 24px;display:flex;align-items:center;justify-content:space-between;">
+  <a href="index.html" style="text-decoration:none;font-size:14px;color:#6B7280;font-weight:500;">← Zurück</a>
+  <a href="index.html" style="text-decoration:none; display:inline-flex; align-items:center; background:#0d0f14; padding:4px 10px; border-radius:8px;">
+    <img src="data:image/jpeg;base64,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" alt="AITECH" style="height:28px;border-radius:6px;">
+  </a>
+  <a href="rechner.html" style="background:#6B8ED8;color:white;padding:7px 16px;border-radius:8px;font-size:13px;font-weight:600;text-decoration:none;">Einzel-Rechner</a>
+</nav>
+
+<div class="hdr">
+  <div class="eyebrow">SONIC AI · CopyX · Multi-Konto-Rechner</div>
+  <h1>Multi-Konto-Rechner</h1>
+  <div class="sub">Alle Konten auf einen Blick · Globale Annahmen · Stand 25.07.2026</div>
+</div>
+
+<!-- GLOBALE ANNAHMEN -->
+<div class="card">
+  <div class="ch"><span class="ci">⚙️</span><span class="ct">Globale Annahmen</span><span class="bdg ba">Gelten für alle Konten</span></div>
+  <div class="cb">
+    <div class="ir">
+      <div class="il">Brutto-Rendite / Woche<small>auf echtes Kapital</small></div>
+      <input type="number" id="g_wk" value="5" min="0" step="0.1" oninput="recalc()">
+      <span class="iu">%</span>
+    </div>
+    <div class="ir">
+      <div class="il">Hebel<small>Standard: 24× Amplify</small></div>
+      <input type="number" id="g_lev" value="24" min="1" max="500" step="1" oninput="recalc()">
+      <span class="iu">×</span>
+    </div>
+    <div class="ir">
+      <div class="il">Performance Fee<small>wird vom Brutto-Gewinn abgezogen</small></div>
+      <input type="number" id="g_pf" value="30" min="0" max="100" step="1" oninput="recalc()">
+      <span class="iu">%</span>
+    </div>
+  </div>
+</div>
+
+<!-- KONTEN-TABELLE -->
+<div class="card">
+  <div class="ch"><span class="ci">💼</span><span class="ct">Konten</span><span class="bdg bg">Klicke auf Name zum Umbenennen</span></div>
+  <div class="cb" style="padding:8px 0;">
+    <div style="overflow-x:auto;">
+      <table class="multi-table" id="acc-table">
+        <thead>
+          <tr>
+            <th>Konto</th>
+            <th>Kapital ($)</th>
+            <th>Brutto/Wo</th>
+            <th>Netto/Mo</th>
+            <th>Netto/Jahr</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="acc-body"></tbody>
+      </table>
+    </div>
+  </div>
+  <div class="row-actions">
+    <button class="btn-add" onclick="addAccount()">+ Konto hinzufügen</button>
+  </div>
+</div>
+
+<!-- ZUSAMMENFASSUNG -->
+<div class="sum-bar" id="sum-bar"></div>
+
+<div class="gtotal">
+  <div>
+    <div class="gtl">Gesamteinkommen Netto / Monat</div>
+    <div class="gts" id="g-sub">Alle Konten kombiniert</div>
+  </div>
+  <div class="gtv" id="g-total">$0</div>
+</div>
+
+<!-- HEBEL-DETAIL -->
+<div class="card">
+  <div class="ch"><span class="ci">📊</span><span class="ct">Hebel-Übersicht</span><span class="bdg bb">Alle Konten</span></div>
+  <div class="cb" id="leverage-detail"></div>
+</div>
+
+<!-- JAHRES-PROJEKTION -->
+<div class="card">
+  <div class="ch"><span class="ci">📅</span><span class="ct">Jahres-Projektion</span><span class="bdg ba">Hochrechnung</span></div>
+  <div class="cb" id="year-proj"></div>
+</div>
+
+<div class="note">
+  <b>Hinweis:</b> Performance Fee (Standard 30%) wird wöchentlich vom Brutto-Gewinn abgezogen. Alle Angaben in USD. Hochrechnungen bei konstanter Wochenrendite — reale Performance schwankt. Vergangene Ergebnisse ≠ Garantie.
+</div>
+
+<div class="fnote">
+  Stand: 25.07.2026 · Alle Werte in USD · Performance Fee wöchentlich<br>
+  Hochrechnungen ≠ Garantie · SONIC AI CopyX-Struktur
+</div>
+
+<script>
+const WPM = 4.33;
+
+let accounts = [
+  { id: 1, name: 'Konto 1', cap: 1000 },
+  { id: 2, name: 'Konto 2', cap: 2500 },
+  { id: 3, name: 'Konto 3', cap: 5000 },
+];
+let nextId = 4;
+
+function gv(id) { return parseFloat(document.getElementById(id).value) || 0; }
+
+function fm(v) {
+  if (v === 0) return '$0';
+  return '$' + Math.abs(v).toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+function fk(v) {
+  if (Math.abs(v) >= 1000000) return '$' + (v/1000000).toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2}) + 'M';
+  if (Math.abs(v) >= 1000) return '$' + (v/1000).toLocaleString('de-DE',{minimumFractionDigits:1,maximumFractionDigits:1}) + 'k';
+  return fm(v);
+}
+
+function addAccount() {
+  accounts.push({ id: nextId++, name: 'Konto ' + (accounts.length + 1), cap: 1000 });
+  render();
+  recalc();
+}
+
+function removeAccount(id) {
+  if (accounts.length <= 1) return;
+  accounts = accounts.filter(a => a.id !== id);
+  render();
+  recalc();
+}
+
+function updateName(id, val) {
+  const acc = accounts.find(a => a.id === id);
+  if (acc) acc.name = val || ('Konto ' + id);
+}
+
+function updateCap(id, val) {
+  const acc = accounts.find(a => a.id === id);
+  if (acc) { acc.cap = parseFloat(val) || 0; recalc(); }
+}
+
+function render() {
+  const tbody = document.getElementById('acc-body');
+  tbody.innerHTML = '';
+
+  accounts.forEach(acc => {
+    const tr = document.createElement('tr');
+    tr.className = 'account-row';
+    tr.setAttribute('data-id', acc.id);
+    tr.innerHTML = `
+      <td><input class="acc-name" type="text" value="${acc.name}" onblur="updateName(${acc.id},this.value)" placeholder="Konto-Name"></td>
+      <td><input class="td-input" type="number" value="${acc.cap}" min="0" step="100" oninput="updateCap(${acc.id},this.value)"></td>
+      <td class="bw-${acc.id}" style="color:var(--orange)">—</td>
+      <td class="nm-${acc.id}" style="color:var(--green)">—</td>
+      <td class="ny-${acc.id}" style="color:var(--blue)">—</td>
+      <td><button class="btn-rm" onclick="removeAccount(${acc.id})" title="Entfernen">✕</button></td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  // Summen-Zeile
+  const trSum = document.createElement('tr');
+  trSum.innerHTML = `
+    <td style="color:#fff">GESAMT</td>
+    <td id="sum-cap" style="color:var(--gold)">—</td>
+    <td id="sum-bw" style="color:var(--orange)">—</td>
+    <td id="sum-nm" style="color:var(--green)">—</td>
+    <td id="sum-ny" style="color:var(--blue)">—</td>
+    <td></td>
+  `;
+  tbody.appendChild(trSum);
+}
+
+function recalc() {
+  const wk  = gv('g_wk');
+  const lev = gv('g_lev') || 24;
+  const pf  = gv('g_pf') / 100;
+  const nf  = 1 - pf;
+
+  let totalCap = 0, totalBW = 0, totalNM = 0, totalNY = 0;
+
+  accounts.forEach(acc => {
+    const bw = acc.cap * wk / 100;             // Brutto/Woche auf echtes Kapital
+    const nm = bw * nf * WPM;                   // Netto/Monat
+    const ny = nm * 12;                          // Netto/Jahr
+    totalCap += acc.cap;
+    totalBW  += bw;
+    totalNM  += nm;
+    totalNY  += ny;
+
+    const bwEl = document.querySelector(`.bw-${acc.id}`);
+    const nmEl = document.querySelector(`.nm-${acc.id}`);
+    const nyEl = document.querySelector(`.ny-${acc.id}`);
+    if (bwEl) bwEl.textContent = fm(bw);
+    if (nmEl) nmEl.textContent = fm(nm);
+    if (nyEl) nyEl.textContent = fk(ny);
+  });
+
+  // Summen-Zeile aktualisieren
+  const sc = document.getElementById('sum-cap');
+  const sb = document.getElementById('sum-bw');
+  const sn = document.getElementById('sum-nm');
+  const sy = document.getElementById('sum-ny');
+  if (sc) sc.textContent = fm(totalCap);
+  if (sb) sb.textContent = fm(totalBW);
+  if (sn) sn.textContent = fm(totalNM);
+  if (sy) sy.textContent = fk(totalNY);
+
+  // Gesamt-Box
+  document.getElementById('g-total').textContent = fm(totalNM);
+  document.getElementById('g-sub').textContent = accounts.length + ' Konto' + (accounts.length === 1 ? '' : 'en') + ' kombiniert · ' + fk(totalNY) + ' / Jahr';
+
+  // Summary Pills
+  const bar = document.getElementById('sum-bar');
+  bar.innerHTML = `
+    <div class="sum-pill"><div class="sp-val" style="color:var(--gold)">${fm(totalCap)}</div><div class="sp-lbl">Gesamt-Kapital</div></div>
+    <div class="sum-pill"><div class="sp-val" style="color:var(--orange)">${fm(totalBW)}</div><div class="sp-lbl">Brutto / Woche</div></div>
+    <div class="sum-pill"><div class="sp-val" style="color:var(--green)">${fm(totalNM)}</div><div class="sp-lbl">Netto / Monat</div></div>
+    <div class="sum-pill"><div class="sp-val" style="color:var(--blue)">${fk(totalNY)}</div><div class="sp-lbl">Netto / Jahr</div></div>
+  `;
+
+  // Hebel-Detail
+  const hk = totalCap * lev;
+  const lvDiv = document.getElementById('leverage-detail');
+  lvDiv.innerHTML = `
+    <div class="rr"><span class="rl">Gesamt echtes Kapital</span><span class="rv rw">${fm(totalCap)}</span></div>
+    <div class="rr"><span class="rl">Handelskraft gesamt (× ${lev})</span><span class="rv ro">${fk(hk)}</span></div>
+    <div class="rr"><span class="rl">Brutto-Gewinn / Woche gesamt</span><span class="rv rn">${fm(totalBW)}</span></div>
+    <div class="rr"><span class="rl">Performance Fee (${(pf*100).toFixed(0)}%) / Woche</span><span class="rv rred">−${fm(totalBW * pf)}</span></div>
+    <div class="rr"><span class="rl" style="font-weight:700;color:#fff">✅ Netto / Woche</span><span class="rv rg">${fm(totalBW * nf)}</span></div>
+    <div class="rr"><span class="rl">Netto / Monat (×4,33)</span><span class="rv rg">${fm(totalNM)}</span></div>
+  `;
+
+  // Jahresprojektion
+  const npct = totalCap > 0 ? (totalNM / totalCap * 100) : 0;
+  const yDiv = document.getElementById('year-proj');
+  yDiv.innerHTML = `
+    <div class="rr"><span class="rl">Netto / Jahr (×12)</span><span class="rv rg">${fk(totalNY)}</span></div>
+    <div class="rr"><span class="rl">Rendite / Monat auf Gesamtkapital</span><span class="rv rg">${npct.toLocaleString('de-DE',{minimumFractionDigits:1,maximumFractionDigits:2})}%</span></div>
+    <div class="rr"><span class="rl">Rendite / Jahr auf Gesamtkapital</span><span class="rv rg">${(npct*12).toLocaleString('de-DE',{minimumFractionDigits:1,maximumFractionDigits:1})}%</span></div>
+    <div class="hb grn" style="margin-top:10px;"><div><div class="hl">Netto-Einkommen / Monat (alle Konten)</div><div class="hs">${npct.toLocaleString('de-DE',{minimumFractionDigits:1,maximumFractionDigits:2})}% netto / Monat auf Kapital</div></div><div class="hv">${fm(totalNM)}</div></div>
+    <div class="hb gld"><div><div class="hl">Brutto / Monat (alle Konten)</div><div class="hs">${(wk*WPM).toLocaleString('de-DE',{minimumFractionDigits:1,maximumFractionDigits:1})}% brutto / Monat</div></div><div class="hv">${fm(totalBW*WPM)}</div></div>
+  `;
+}
+
+// Init
+render();
+recalc();
+</script>
+</body>
+</html>
