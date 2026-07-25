@@ -1239,6 +1239,115 @@
   </div>
 </footer>
 
+
+<style>
+  /* ── Scroll-Reveal Base ── */
+  .reveal {
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity 0.55s cubic-bezier(0.22,1,0.36,1),
+                transform 0.55s cubic-bezier(0.22,1,0.36,1);
+  }
+  .reveal.revealed {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  /* Stagger delays for children */
+  .reveal-d1 { transition-delay: 0.08s; }
+  .reveal-d2 { transition-delay: 0.16s; }
+  .reveal-d3 { transition-delay: 0.24s; }
+  .reveal-d4 { transition-delay: 0.32s; }
+
+  /* Scale-in variant for logos/icons */
+  .reveal-scale {
+    opacity: 0;
+    transform: scale(0.88);
+    transition: opacity 0.45s cubic-bezier(0.22,1,0.36,1),
+                transform 0.45s cubic-bezier(0.22,1,0.36,1);
+  }
+  .reveal-scale.revealed {
+    opacity: 1;
+    transform: scale(1);
+  }
+</style>
+
+<script>
+(function () {
+  // Intersection Observer
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('revealed');
+        io.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+
+  function tag(el, extra) {
+    el.classList.add('reveal');
+    if (extra) el.classList.add(extra);
+    io.observe(el);
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    // Section headers
+    document.querySelectorAll('.section-header').forEach(el => tag(el));
+
+    // Stat cards — staggered
+    document.querySelectorAll('.stat-card').forEach((el, i) => {
+      tag(el, `reveal-d${Math.min(i+1,4)}`);
+    });
+
+    // Eco cards (4 Komponenten) — staggered
+    document.querySelectorAll('.eco-card').forEach((el, i) => {
+      tag(el, `reveal-d${Math.min(i+1,4)}`);
+    });
+
+    // Performance / daily card
+    document.querySelectorAll('.daily-card, .perf-disclaimer').forEach(el => tag(el));
+
+    // Week accordions
+    document.querySelectorAll('.week-acc').forEach((el, i) => {
+      tag(el, `reveal-d${Math.min(i+1,4)}`);
+    });
+
+    // Cards (generic .card)
+    document.querySelectorAll('.card').forEach(el => tag(el));
+
+    // Feature list items
+    document.querySelectorAll('.feature-item, .feature-row').forEach((el, i) => {
+      tag(el, `reveal-d${Math.min(i % 4 + 1, 4)}`);
+    });
+
+    // X24 steps
+    document.querySelectorAll('.x24-step').forEach((el, i) => {
+      tag(el, `reveal-d${Math.min(i+1,4)}`);
+    });
+
+    // Onboarding steps
+    document.querySelectorAll('.step-item, .onboarding-step').forEach((el, i) => {
+      tag(el, `reveal-d${Math.min(i+1,4)}`);
+    });
+
+    // CTA / finale sections
+    document.querySelectorAll('.finale-card, #jetzt-starten .card').forEach(el => tag(el));
+
+    // Rechner teaser buttons
+    document.querySelectorAll('#rechner a').forEach((el, i) => {
+      tag(el, `reveal-d${i+1}`);
+    });
+
+    // SVG chart area
+    document.querySelectorAll('.chart-wrap, .perf-bento').forEach(el => tag(el));
+
+    // Footer elements
+    document.querySelectorAll('footer > *').forEach((el, i) => {
+      tag(el, `reveal-d${Math.min(i+1,4)}`);
+    });
+  });
+})();
+</script>
+
 </body>
 </html>
 
